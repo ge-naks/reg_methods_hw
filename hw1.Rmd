@@ -1,0 +1,76 @@
+HW1 George W Nakhla
+
+
+Package installs:
+```{r}
+#install.packages("MPV")
+library("MPV")
+library("knitr")
+```
+
+Q1: Question 2.3. Table B.2 presents data collected during a solar energy project at Georgia
+Tech
+
+a) Fit a simple linear regression model relating total heat flux y (kilowatts) to the radial
+deflection of the deflected rays x4 (milliradians).
+```{r}
+solarData <- table.b2
+fit <- lm( y ~ x4, data = solarData)
+lm( y ~ x4, data = solarData)
+plot(solarData$x4, solarData$y, 
+     xlab = "radial deflection of deflected rays (x4)", 
+     ylab = "total heat flux (y)",
+     main = "Model")
+abline(fit)
+```
+
+
+So we have the equation y = 607.1 -21.4(x4) as plotted above
+
+
+b) Construct the analysis-of-variance table and test for significance of regression.
+```{r}
+summary(fit)
+anova_result <- anova(fit)
+print(anova_result)
+```
+
+72.05% of the variance in y is explained by x4
+<br>
+The p value of the F statistic is extremely low, indicating that the overall model is significant
+<br>
+
+c) Find a 99% CI on the slope.
+```{r}
+conf_interval <- confint(fit, level = 0.99)
+print(conf_interval)
+
+```
+After running this and seeing the results, we can say that we are 99% certain that the true slope of the regression (beta1) falls
+between:
+<br>
+(-28.50995, -14.29497)
+
+d) Calculate R^2
+```{r}
+#previously printed the summary, but this will show only r^2
+summary(fit)$r.squared
+```
+Again, we can say that 72.05% of the variance in y is explained by x4 based on this r^2 value
+e) Find a 95% CI on the mean heat flux when the radial deflection is 16.5 milliradians.
+
+```{r}
+# Define the new data point
+new_data <- data.frame(x4 = 16.5)
+
+# Predict the mean heat flux and obtain confidence intervals
+prediction <- predict(fit, newdata = new_data, interval = "confidence", level = 0.95)
+
+# Print the prediction and confidence intervals
+print(prediction)
+```
+
+We see that based on the model, we get an expected heat flux of 253.9627 kilowatts. We are 95% certain that the true expected heat flux would be between:
+<br>
+(249.1468, 258.7787)
+
