@@ -109,3 +109,63 @@ confint(homeFit, level = 0.95)
 We are 95% certain that the true slope of B1 lies between:
 (2.514988, 4.133754)
 
+### e) Find a 95% CI on the mean selling price of a house for which the current taxes are $750.
+```{r}
+# NOTE: x1 is documented to be represented in thousands, so we will use 750/1000 = .75
+new_data <- data.frame(x1 = .75)
+predict(homeFit, newdata = new_data, interval = "confidence", level = 0.95)
+
+```
+NOTE: All in thousands
+The prediction model expresses that we can expect a house selling price of 15.81346 for a tax cost of .75. We are 95% certain that the true selling price for a house with a .75 tax cost is:
+<br>
+(11.06792, 20.55899)
+## Q3: Question 2.7. The purity of oxygen produced by a fractional distillation process is thought to be related to the percentage of hydrocarbons in the main condenser of the processing unit.
+
+### a) Fit a simple linear regression model to the data.
+```{r}
+chemData <- p2.7
+chemFit = lm(purity ~ hydro, data = chemData)
+print(chemFit)
+plot(chemData$hydro, chemData$purity,
+     xlab = "Hydrocarbons",
+     ylab = "Purity",
+     main = "Hydrocarbons vs. O2 Purity")
+abline(chemFit)
+```
+The formula describing the model is y = 77.86 + 11.80β1, where 77.86 represents the oxygen purity at a 0 percent hydrocarbon concentration and 11.80 represents the expected units of increase of y for every unit of x.
+
+### b) Test the hypothesis H0:β1 = 0.
+```{r}
+# we can set up our null hypothesis to be: H0:β1 = 0
+# Our alternative hypothesis, H_a is β1 != 0
+# since no alpha value is given, we can assume to have a two tailed test with an alpha of .1
+# we can conduct this with a hypothesis t test. we can find the p value by calling:
+summary(chemFit)
+```
+Since our p-value is 0.003291 which is less than our one tailed alpha of .05, we can reject the null in favor of the alternate. We have sufficient evidence to claim that β1 != 0.
+
+### c) c. Calculate R^2^
+```{r}
+summary(chemFit)$r.squared
+```
+We get an R^2^ value of 0.3891224. This means that 38.91224% of the variability in the oxygen purity can be attributed to the percentage of hydrocarbons in the main condenser.
+
+
+### d) Find a 95% CI on the slope.
+```{r}
+confint(chemFit, level = 0.95)
+```
+We are 95% certain that the true slope (β1) falls between:
+(4.479066, 19.12299)
+
+### d) Find a 95% CI on the mean purity when the hydrocarbon percentage is 1.00.
+```{r}
+new_data = data.frame(hydro = 1.00)
+predict(chemFit, newdata = new_data, interval = "confidence", level = 0.95)
+```
+The model predicts that at a hydrocarbon percentage of 1.00, the purity will be at 89.66%. We are 95% certain that the true purity will be between (in percent):
+(87.51017, 91.81845)
+
+
+## Q4: 
