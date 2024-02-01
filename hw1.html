@@ -635,8 +635,63 @@ purity will be at 89.66%. We are 95% certain that the true purity will
 be between (in percent): (87.51017, 91.81845)</p>
 </div>
 </div>
-<div id="q4" class="section level2">
-<h2>Q4:</h2>
+<div id="q4-question-2.8.-consider-the-oxygen-plant-data-in-problem-2.7-and-assume-that-purity-and-hydrocarbon-percentage-are-jointly-normally-distributed-random-variables." class="section level2">
+<h2>Q4: Question 2.8. Consider the oxygen plant data in Problem 2.7 and
+assume that purity and hydrocarbon percentage are jointly normally
+distributed random variables.</h2>
+<div id="a-what-is-the-correlation-between-oxygen-purity-and-hydrocarbon-percentage" class="section level3">
+<h3>a) What is the correlation between oxygen purity and hydrocarbon
+percentage?</h3>
+<pre class="r"><code># we are using the same data as Q3
+
+# two ways to calculate it!
+cor(chemData$purity, chemData$hydro)</code></pre>
+<pre><code>## [1] 0.6237968</code></pre>
+<pre class="r"><code>sqrt(summary(chemFit)$r.squared)</code></pre>
+<pre><code>## [1] 0.6237968</code></pre>
+<p>The correlation coefficient (r) is equal to 0.6237968. This indicates
+a moderately strong positive linear relationship between the hydrocarbon
+% and the purity of the oxygen.</p>
+</div>
+<div id="b-test-the-hypothesis-that-ρ-0." class="section level3">
+<h3>b) Test the hypothesis that ρ = 0.</h3>
+<pre class="r"><code># can assume alpha of .1
+# H0 :ρ = 0; our alternate hypothesis is that ρ != 0. We can conduct Pearson&#39;s product moment correlation by calling:
+cor.test(chemData$purity, chemData$hydro)</code></pre>
+<pre><code>## 
+##  Pearson&#39;s product-moment correlation
+## 
+## data:  chemData$purity and chemData$hydro
+## t = 3.3861, df = 18, p-value = 0.003291
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  0.2503961 0.8356439
+## sample estimates:
+##       cor 
+## 0.6237968</code></pre>
+<pre class="r"><code># and checking the p-value</code></pre>
+<p>We get a p value of .003 which is less than our alpha, and as such
+gives us sufficient evidence to reject H0 in favor of our alternate.</p>
+</div>
+<div id="c-construct-a-95-ci-for-ρ." class="section level3">
+<h3>c) Construct a 95% CI for ρ.</h3>
+<pre class="r"><code># can call the same function as before as it also gives us a 95% CI
+cor.test(chemData$purity, chemData$hydro)</code></pre>
+<pre><code>## 
+##  Pearson&#39;s product-moment correlation
+## 
+## data:  chemData$purity and chemData$hydro
+## t = 3.3861, df = 18, p-value = 0.003291
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  0.2503961 0.8356439
+## sample estimates:
+##       cor 
+## 0.6237968</code></pre>
+<p>We see that running this gives us a 95% CI of (0.2503961, 0.8356439).
+The interpretation of this is that we are 95% certain that the true
+value of ρ lies between: <br> (0.2503961, 0.8356439)</p>
+</div>
 </div>
 </div>
 

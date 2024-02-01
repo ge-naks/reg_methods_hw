@@ -168,4 +168,32 @@ The model predicts that at a hydrocarbon percentage of 1.00, the purity will be 
 (87.51017, 91.81845)
 
 
-## Q4: 
+## Q4: Question 2.8. Consider the oxygen plant data in Problem 2.7 and assume that purity and hydrocarbon percentage are jointly normally distributed random variables.
+
+### a) What is the correlation between oxygen purity and hydrocarbon percentage?
+```{r}
+# we are using the same data as Q3
+
+# two ways to calculate it!
+cor(chemData$purity, chemData$hydro)
+sqrt(summary(chemFit)$r.squared)
+```
+The correlation coefficient (r) is equal to 0.6237968. This indicates a moderately strong positive linear relationship between the hydrocarbon % and the purity of the oxygen.
+
+### b) Test the hypothesis that ρ = 0.
+```{r}
+# can assume alpha of .1
+# H0 :ρ = 0; our alternate hypothesis is that ρ != 0. We can conduct Pearson's product moment correlation by calling:
+cor.test(chemData$purity, chemData$hydro)
+# and checking the p-value
+```
+We get a p value of .003 which is less than our alpha, and as such gives us sufficient evidence to reject H0 in favor of our alternate.
+
+### c) Construct a 95% CI for ρ.
+```{r}
+# can call the same function as before as it also gives us a 95% CI
+cor.test(chemData$purity, chemData$hydro)
+```
+We see that running this gives us a 95% CI of (0.2503961, 0.8356439). The interpretation of this is that we are 95% certain that the true value of ρ lies between:
+<br>
+(0.2503961, 0.8356439)
