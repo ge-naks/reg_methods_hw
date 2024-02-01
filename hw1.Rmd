@@ -120,6 +120,7 @@ NOTE: All in thousands
 The prediction model expresses that we can expect a house selling price of 15.81346 for a tax cost of .75. We are 95% certain that the true selling price for a house with a .75 tax cost is:
 <br>
 (11.06792, 20.55899)
+
 ## Q3: Question 2.7. The purity of oxygen produced by a fractional distillation process is thought to be related to the percentage of hydrocarbons in the main condenser of the processing unit.
 
 ### a) Fit a simple linear regression model to the data.
@@ -159,7 +160,7 @@ confint(chemFit, level = 0.95)
 We are 95% certain that the true slope (β1) falls between:
 (4.479066, 19.12299)
 
-### d) Find a 95% CI on the mean purity when the hydrocarbon percentage is 1.00.
+### e) Find a 95% CI on the mean purity when the hydrocarbon percentage is 1.00.
 ```{r}
 new_data = data.frame(hydro = 1.00)
 predict(chemFit, newdata = new_data, interval = "confidence", level = 0.95)

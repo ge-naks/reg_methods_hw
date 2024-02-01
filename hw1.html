@@ -549,11 +549,13 @@ predict(homeFit, newdata = new_data, interval = &quot;confidence&quot;, level = 
 <p>NOTE: All in thousands The prediction model expresses that we can
 expect a house selling price of 15.81346 for a tax cost of .75. We are
 95% certain that the true selling price for a house with a .75 tax cost
-is: <br> (11.06792, 20.55899) ## Q3: Question 2.7. The purity of oxygen
-produced by a fractional distillation process is thought to be related
-to the percentage of hydrocarbons in the main condenser of the
-processing unit.</p>
+is: <br> (11.06792, 20.55899)</p>
 </div>
+</div>
+<div id="q3-question-2.7.-the-purity-of-oxygen-produced-by-a-fractional-distillation-process-is-thought-to-be-related-to-the-percentage-of-hydrocarbons-in-the-main-condenser-of-the-processing-unit." class="section level2">
+<h2>Q3: Question 2.7. The purity of oxygen produced by a fractional
+distillation process is thought to be related to the percentage of
+hydrocarbons in the main condenser of the processing unit.</h2>
 <div id="a-fit-a-simple-linear-regression-model-to-the-data." class="section level3">
 <h3>a) Fit a simple linear regression model to the data.</h3>
 <pre class="r"><code>chemData &lt;- p2.7
@@ -623,8 +625,8 @@ percentage of hydrocarbons in the main condenser.</p>
 <p>We are 95% certain that the true slope (β1) falls between: (4.479066,
 19.12299)</p>
 </div>
-<div id="d-find-a-95-ci-on-the-mean-purity-when-the-hydrocarbon-percentage-is-1.00." class="section level3">
-<h3>d) Find a 95% CI on the mean purity when the hydrocarbon percentage
+<div id="e-find-a-95-ci-on-the-mean-purity-when-the-hydrocarbon-percentage-is-1.00." class="section level3">
+<h3>e) Find a 95% CI on the mean purity when the hydrocarbon percentage
 is 1.00.</h3>
 <pre class="r"><code>new_data = data.frame(hydro = 1.00)
 predict(chemFit, newdata = new_data, interval = &quot;confidence&quot;, level = 0.95)</code></pre>
