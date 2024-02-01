@@ -1,4 +1,4 @@
-HW1 George W Nakhla
+# HW1 George W Nakhla
 
 
 Package installs:
@@ -8,11 +8,9 @@ library("MPV")
 library("knitr")
 ```
 
-Q1: Question 2.3. Table B.2 presents data collected during a solar energy project at Georgia
-Tech
+## Q1: Question 2.3. Table B.2 presents data collected during a solar energy project at Georgia Tech
 
-a) Fit a simple linear regression model relating total heat flux y (kilowatts) to the radial
-deflection of the deflected rays x4 (milliradians).
+### a) Fit a simple linear regression model relating total heat flux y (kilowatts) to the radial deflection of the deflected rays x4 (milliradians).
 ```{r}
 solarData <- table.b2
 fit <- lm( y ~ x4, data = solarData)
@@ -25,22 +23,22 @@ abline(fit)
 ```
 
 
-So we have the equation y = 607.1 -21.4(x4) as plotted above
+So we have the equation y = 607.1 -21.4(x4) as plotted above. This is a negative relationship, and describes that for each one unit increase in x4, we can expect a 21.4 unit decrease of y. The 607.1 can be interpreted as a radial deflection of 0, we can expect a heat flux to be 607.1
 
 
-b) Construct the analysis-of-variance table and test for significance of regression.
+### b) Construct the analysis-of-variance table and test for significance of regression.
 ```{r}
+# here, we want to conduct a hypothesis test for our regression coefficient. Our H0 (null hypothesis) is that there is no relationship between x4 and y (B1 is 0). The alternative hypothesis is that B1 is non 0. In this case, the previous graph more strongly suggests that B1 is less than 0, or an inverse relationship.
 summary(fit)
-anova_result <- anova(fit)
-print(anova_result)
+anova(fit)
 ```
 
 72.05% of the variance in y is explained by x4
 <br>
-The p value of the F statistic is extremely low, indicating that the overall model is significant
+The p value of the F statistic is extremely low (5.935e-09), indicating that the overall model is significant and that the slope (B1) is not zero. We reject the initial hypothesis in favor of the alternative.
 <br>
 
-c) Find a 99% CI on the slope.
+### c) Find a 99% CI on the slope.
 ```{r}
 conf_interval <- confint(fit, level = 0.99)
 print(conf_interval)
@@ -51,13 +49,14 @@ between:
 <br>
 (-28.50995, -14.29497)
 
-d) Calculate R^2
+### d) Calculate R^2^
 ```{r}
 #previously printed the summary, but this will show only r^2
 summary(fit)$r.squared
 ```
 Again, we can say that 72.05% of the variance in y is explained by x4 based on this r^2 value
-e) Find a 95% CI on the mean heat flux when the radial deflection is 16.5 milliradians.
+
+### e) Find a 95% CI on the mean heat flux when the radial deflection is 16.5 milliradians.
 
 ```{r}
 # Define the new data point
@@ -73,4 +72,40 @@ print(prediction)
 We see that based on the model, we get an expected heat flux of 253.9627 kilowatts. We are 95% certain that the true expected heat flux would be between:
 <br>
 (249.1468, 258.7787)
+
+## Q2: Question 2.6. Table B.4 presents data for 27 houses sold in Erie, Pennsylvania.
+
+### a) Fit a simple linear regression model relating selling price of the house to the current taxes ( x1 ).
+```{r}
+houseData <- table.b4
+lm(y ~ x1, data = houseData)
+homeFit <- lm(y ~ x1, data = houseData)
+plot(houseData$x1,houseData$y,
+     xlab = "Current Taxes",
+     ylab = "Selling Price",
+     main = "Current Taxes vs. House Selling Price")
+abline(homeFit)
+```
+
+Based on the regression, we see that the equation of the model plotted above is: y = 13.320 + 3.324(x1). This suggests that for each 1 unit increase in x1, we can expect a 3.324 increase in y. The interpretation of 13.320 is that at a tax cost of 0 (which in this case is unrealistic), we can expect a house selling price of 13.320.
+
+### b) Test for significance of regression.
+```{r}
+# here, we want to conduct a hypothesis test for our regression coefficient. Our H0 (null hypothesis) is that there is no relationship between x1 and y (B1 is 0). The alternative hypothesis is that B1 is non 0. In this case, the previous graph more strongly suggests that B1 is greater than 0, or a positive relationship.
+summary(homeFit)
+```
+At a p-value of 2.051e-08, we can confidently reject the null hypothesis in favor of the alternate. This is evidence that there is a non-zero relationship between tax cost and house selling price.
+
+### c)  Calculate R^2^
+```{r}
+summary(homeFit)$r.squared
+```
+We can say that 76.73344% of the variance in y is explained by x2 based on this r^2^ value
+
+### d) Find a 95% CI on the slope.
+```{r}
+confint(homeFit, level = 0.95)
+```
+We are 95% certain that the true slope of B1 lies between:
+(2.514988, 4.133754)
 
