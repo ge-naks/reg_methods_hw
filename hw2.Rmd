@@ -1,0 +1,9 @@
+# HW2 George W Nakhla
+
+
+Package installs:
+```{r}
+#install.packages("MPV")
+library("MPV")
+library("knitr")
+```
