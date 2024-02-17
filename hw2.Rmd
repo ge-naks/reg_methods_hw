@@ -4,6 +4,200 @@
 Package installs:
 ```{r}
 #install.packages("MPV")
+#install.packages("syllogi")
+#install.packages("car")
 library("MPV")
 library("knitr")
+library("syllogi")
+library(car)
 ```
+
+
+# Q1: Question 3.7. Consider the house price data in Table B.4.
+## a. Fit a multiple regression model relating selling price to all nine regressors.
+```{r}
+houseData <- table.b4
+houseFit <- lm(y ~ ., data = houseData)
+houseFit
+```
+We see that we return several different coefficients. These represent different β1 values associated with each regressor and the response variable. We can interpret the coefficient of x1 as the expected change in the housing price (y) for each 1 unit change of x1. This interpretation can be applied to each of the 9 regressors, where the coefficient describes the expected change of the response variable.
+<br>
+<br>
+The interpretation of the intercept (14.92765) or β0 is the expected output (home price) when all regressors (x1-x9) are 0.
+
+
+## b. Construct the analysis of variance table and test for significance of regression.
+```{r}
+# here, we want to conduct a hypothesis test for our regression coefficients. Our H0 (null hypothesis) is that there is no relationship between the regressors and y (β1s are 0). The alternative hypothesis is that β1s are non 0.
+
+summary(houseFit)
+anova(houseFit)
+```
+We see that the adjusted R^2^ is 0.7587 meaning that 75.87% of the change in y can be explained by the changes in the regressors (x1-x9). We opt to use the adjusted value here as we are using more than one regressor.
+<br>
+<br>
+Looking at the p-values for the different regressors, we see that a vast majority of them are quite high (x4 for example has a p value of .95537), meaning that they are statistically insignificant at even very high values of α. That being said, we see that x1 would be considered statistically significant for even α = .01. We see that x2 would also be considered statistically significant for values of α = .1. Assuming an α of .1, we can say that the only statistically significant regressors are x1 and x2, for which we reject the null hypothesis. For the other regressors with large p-values, we accept the null hypothesis.
+
+## c. Use t tests to assess the contribution for each regression to the model. Discuss your findings.
+```{r}
+summary(houseFit)
+newHouseFit <- lm(y ~ x1 + x2, data = houseData)
+summary(newHouseFit)
+```
+This gives us the p values for the each of the 9 regressors. We see that  that for α = .1, only x1 and x2 seem to actually contribute significantly to the model. Based on these findings, it seems that creating a model with only x1 and x2 would still accurately predict the house price. Fitting a new model with only these 2 variables, we see that it holds true, the adjusted R^2^ value is actually higher than it was originally at .7837 showing that those two variables are able to explain just as much as all 9 variables in the original model.
+
+## d. What is the contribution of lot size and living space to the model given all of the other regressors are included?
+```{r}
+# note: lot size is x3, living space is x4 (both in thousands)
+
+# reduced model containing all other regressors EXCEPT lot size and living space
+reducedFit <- lm(y ~ . - x3 - x4, data = houseData)
+
+anova(houseFit,reducedFit)
+```
+What we are doing here is Fisher's test, comparing 2 linear regression models. Our null hypothesis is that the additional regressors (x3, x4) do NOT significantly contribute to the model. We can assume an α of .05. Looking at the p value we get (0.7296), we have insufficient evidence to conclude that x3 and x4 significantly contribute to the model. We accept the null.
+
+## e. Is multicollinearity a potential problem in this model?
+```{r}
+vif(houseFit)
+```
+Explanatory variables with high VIF values usually indicate that they have high collinearity From this, we note that x6 and x7 might potentially have issues with collinearity. Taking a look at what these values actually represent, x6 is the number of rooms and x7 is the number of bedrooms. Considering that these values are directly proportional, it makes perfect sense that they are colinear. To fix this issue we can remove one (or both) of these values as just one is enough to capture the information we need.
+
+# 2. Question 3.8. The data in Table B.5 present the performance of a chemical process of a function of several controllable process variables.
+## a. Fit a multiple regression model relating CO2 product (y) to total solvent (x6) and hydrogen consumption (x7)
+```{r}
+chemData <- table.b5
+chemFit <- lm(y ~ x6 + x7, chemData)
+chemFit
+```
+So we have the equation y = 2.52646 + 0.01852(x6) +2.18575(x7). This describes that for each one unit increase in x6, we can expect a 0.01852 unit increase of y; and for each one unit increase in x7, we can expect a 2.18575 unit increase of y  The 2.52646 can be interpreted as CO2 when total solvent and consumption is 0.
+
+
+## b. Test for significance of the regression. Calculate R2 and R2 Adj.
+```{r}
+summary(chemFit)
+anova(chemFit)
+
+
+# an example of how regressors can perform better together!
+fit1 <- lm(y ~ x7, chemData)
+anova(chemFit, fit1 )
+
+
+```
+We see that R^2^ is 0.6996 and  R^2^*adj* is 0.6746. We can interpret the first R^2^ value as meaning 69.96% of the variability in y can be explained by changes in x6 and x7. Likewise, the R^2^*adj* value is interpreted as 67.46% of the changes in y can be explained by changes in x6 and x7.
+
+<br>
+<br>
+This ANOVA table confirms that the regression model is statistically significant (both p-values less than .05) and that both predictor variables, total solvent (x6) and hydrogen consumption (x7), contribute significantly to predicting the CO2 product.
+
+
+## c. Using t tests determine the contribution of x6 and x7 to the model.
+```{r}
+summary(chemFit)
+```
+We see that both are statistically significant with p values less than .05 (5.66e-07 for x6 and 0.0341 for x7). We reject the null hypothesis that both regressors have a slope β=0.
+
+
+
+
+## d. Construct 95% CIs on β6 and β7.
+```{r}
+confint(chemFit)
+```
+From this, we can conclude that we are 95% certain the true value of β6 falls between:
+<br>
+(0.01285196, 0.02419204)
+and that we can conclude that we are 95% certain the true value of β7 falls between:
+(0.17820756, 4.19329833)
+
+
+## e. Refit the model using only x6 as the regressor. Test for significance of regression and calculate R2 and R2 adj. Discuss your findings. Based on these statistics, are you satisfied with this model?
+
+```{r}
+# an example of how regressors can perform better together!
+reducedChemFit <- lm(y ~ x6, chemData)
+summary(reducedChemFit)$r.squared
+summary(reducedChemFit)$adj.r.squared
+
+anova(reducedChemFit)
+
+
+```
+We see that both values of R^2^ are lowered, since were only using one explanatory variable, we can use regular R^2^. We expect x6 to be able to explain 63.64% of the variability in y. This is only slightly lower than the value for R^2^ we got with both regressors. We also see that x6 is still statistically significant, where we reject the null hypothesis that β6 = 0 since our p value is less than .05. We can be satisfied with this model, but the initial model is still better, although it might not be as practical to record that much additional data for this additional benefit.
+
+
+
+## f. Construct a 95% CI on β6 using the model you fit in part e. Compare the length of this CI to the length of the CI in part d. Does this tell you anything important about the contribution of x7 to the model?
+```{r}
+confint(chemFit)
+confint(reducedChemFit)
+```
+Original Model CI: (0.01285196, 0.02419204). length of: 0.01134008
+<br>
+New Model CI: (0.01335688, 0.02543261) length of: 0.01207573
+<br>
+<br>
+We are 95% certain that the true value for β6 falls between the range (0.01335688, 0.02543261)
+<br>
+<br>
+The new model has a wider length for the CI range. This means that there in more uncertainty when predicting the true value of β6. Since the only thing we changed is the inclusion of x7 as a predicting variable, we can conclude that x7 provides additional explanatory power.
+
+
+
+## g. Compare the values of MSRes obtained for the two models you have fit (parts (a) and (e)). How did the MSRes change when you removed x7 from the model? Does this tell you anything important about the contribution of x7 to the model?
+```{r}
+
+MSRes_a <- summary(chemFit)$sigma^2
+MSRes_e <- summary(reducedChemFit)$sigma^2
+
+cat("MSRes for the model in part (a):", MSRes_a, "\n")
+cat("MSRes for the model in part (e):", MSRes_e, "\n")
+
+
+cat("Change in MSRes when x7 was removed from the model:", MSRes_e - MSRes_a, "\n")
+```
+The change in MSRes indicates how the variability of the residuals changed when x7 was removed from the model. We see an increase in MSRes, showing that the model's got worse when x7 was removed. This suggests that x7 contributes significantly to explaining the variability in y, more than what x6 can explain on its own. x7 plays an important role in predicting the CO2 product, and its inclusion in the model improves the model's ability to capture the variability in y.
+
+
+
+# 3. Question 3.9. The concentration of N bOCl3 in a tube-flow reactor as a function of several controllable variables is shown in Table B.6.
+## a. Fit a multiple regression model relating concentration of N bOCl3 ( y ) to concentration of COCl2 , ( x1 ) and mole fraction ( x4 ).
+```{r}
+flowData <- table.b6
+flowFit <- lm(y ~ x1 + x4, flowData)
+```
+## b. Test for significance of regression.
+```{r}
+anova(flowFit)
+```
+We see that the significance of x1 at a p value less than .05, and that the x4 does not produce statistically significant results at a p value of .98. We reject the null hypothesis for x1 (β1 != 0) and we do not have sufficient evidence to reject the null for x4 (β4 = 0).
+
+## c. Calculate R2 and R2 Adj for this model.
+```{r}
+cat("R2 is:", summary(flowFit)$r.squared, "\n")
+cat("R2 adj is:", summary(flowFit)$adj.r.squared, "\n")
+```
+We say that 63.66% of the variabiliy in y is a result of change in x1 and x4. Since we have more than one regressor, we opt to use R^2^ adj here.
+
+
+## d. Using t tests, determine the contribution of x1 and x4 to the model. Are both regressors x1 and x4 necessary?
+```{r}
+# set the null that each individual regressor has a slope (B1) of 0. alpha = .05
+summary(flowFit)
+
+plot(flowData$x4,flowData$y)
+
+reducedFlowFit <- lm(y ~ x1, flowData)
+summary(reducedFlowFit)
+
+```
+We see that the p value for x1 is 2.74e-05, less than our alpha of .05, meaning we reject the null and have enough evidence to conclude that the β for x1 is nonzero. For x4, we cannot make this conclusion, as the p value is very high. We have insufficient evidence to reject our null that the β for x4 is nonzero. Plotting x4 and y, we see that there doesn't really look like there is much of a (linear) relationship, so our conclusion follows. Only x1 seems to be necessary. Fitting a model with x1 on its own, again we come to that same conclusion because of the low p value.
+
+
+## e. Is multicollinearity a potential concern in this model?
+```{r}
+vif(flowFit)
+```
+With both VIF values very low, there is no concern for potential co-linearity.
+
