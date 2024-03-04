@@ -1,0 +1,77 @@
+# HW3 George W Nakhla
+
+
+Package installs:
+```{r}
+#install.packages("MPV")
+library("MPV")
+library("knitr")
+```
+
+
+
+## 1. Question 3.14. The kinematic viscosity of a certain solvent system depends on the ratio of the two solvents and the temperature. Table B.10 summarizes a set of experimental results.
+### a. Fit a multiple linear regression model relating the viscosity to the two regressors.
+```{r}
+#note:
+# x1 Ratio of 2-methoxyethanol to 1,2-dimethoxyethane
+# x2 Temperature (in degrees Celsius)
+# y Kinematic viscosity (.000001 m2/s
+
+
+solventData <- table.b10
+
+solventFit <- lm(y ~ x1 + x2, data = solventData)
+
+solventFit
+
+```
+We except a 1 unit increase in x1(ratio) leads to a 1.40733 unit increase in y (viscocity) while a 1 unit increase in x2 (temp) leads to a -0.01563 unit decrease in y. The intercept or β0, is the expected output (viscocity) when both regressors are 0.
+
+### b. Test for significance of regression. What conclusions can you draw?
+```{r}
+
+anova(solventFit)
+```
+Adj r^2^ = 0.8124 meaning 81.24% of variability in viscositiy comes from variability in the ratio and temperature.
+<br>
+<br>
+We see that the model is statistically signficant as both regressors have a p value less than our test of α =.01. By using both temperature and ratio, we can reasonably predict the viscosity.
+
+
+### c. Use t tests to assess the contribution of each regressor to the model. Discuss your findings.
+```{r}
+summary(solventFit)
+```
+The model as a whole is statistically significant and so is each individual regressors contribution to the model. After performing the t test, we see both x1 and x2 have p values below our α of .01, meaning that each contribute significantly to the model.
+
+
+
+
+### d. Calculate R2 and R2 Adj for this model. Compare these values to the R2 and R2 Adj for the simple linear regression model relating the viscosity to temperature only. Discuss your results.
+
+Gathered from the above sumamry we see:
+r^2^ = 0.822 meaning 82.2% of variability in viscositiy comes from variability in the ratio and temperature.
+Adj r^2^ = 0.8124 meaning 81.24% of variability in viscositiy comes from variability in the ratio and temperature.
+
+we see that the adj r^2^ is slightly lower. This makes sense since we are including another variable, meaning the r^2^ test becomes more harsh with more variables, especially if the variables are unhelpful in the model. We see the difference is less than a 1% change, which is to be expected as both of these regressors are significant
+
+
+
+### e. Find a 99% CI for the regression coefficient for temperature for both models in part d. Discuss any differences.
+```{r}
+
+```
+
+
+
+## 2. Question 4.1. Consider the simple regression model fit to the National Football League team performance data in Problem 2.1. (Data are given in Table B.1, and treats number of yards rushing by opponents ( x8 ) as the explanatory variable, and the number of games won ( y ) as the response variable.)
+### a. Construct a normal probability plot of the residuals. Does there seem to be any problem with the normality assumption?
+### b. Construct and interpret a plot of the residuals versus the predicted response.
+### c. Plot the residuals versus the team passing yardage, x2 . Does this plot indicate that the model will be improved by adding x2 to the model?
+
+
+## 3. Question 4.17. In Problem 3.14, you were asked to fit a model to the kinematic viscosity data in Table B.10.
+### a. Construct a normality plot of the residuals from the full model. Does there seem to be any problem with the normality assumption?
+### b. Construct and interpret a plot of the residuals versus the predicted response.
+### c. In Problem 3.14, you were asked to fit a second model. Compute the PRESS statistic for both models. Based on this statistic, which model is most likely to provide better predictions of new data?
