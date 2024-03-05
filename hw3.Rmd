@@ -6,6 +6,11 @@ Package installs:
 #install.packages("MPV")
 library("MPV")
 library("knitr")
+#install.packages("ggplot2")
+library("ggplot2")
+#install.packages("qpcR")
+library(qpcR)
+
 ```
 
 
@@ -33,7 +38,7 @@ We except a 1 unit increase in x1(ratio) leads to a 1.40733 unit increase in y (
 
 anova(solventFit)
 ```
-Adj r^2^ = 0.8124 meaning 81.24% of variability in viscositiy comes from variability in the ratio and temperature.
+Adj r^2^ = 0.8124 meaning 81.24% of variability in viscosity comes from variability in the ratio and temperature.
 <br>
 <br>
 We see that the model is statistically signficant as both regressors have a p value less than our test of α =.01. By using both temperature and ratio, we can reasonably predict the viscosity.
@@ -49,29 +54,137 @@ The model as a whole is statistically significant and so is each individual regr
 
 
 ### d. Calculate R2 and R2 Adj for this model. Compare these values to the R2 and R2 Adj for the simple linear regression model relating the viscosity to temperature only. Discuss your results.
-
-Gathered from the above sumamry we see:
-r^2^ = 0.822 meaning 82.2% of variability in viscositiy comes from variability in the ratio and temperature.
-Adj r^2^ = 0.8124 meaning 81.24% of variability in viscositiy comes from variability in the ratio and temperature.
-
-we see that the adj r^2^ is slightly lower. This makes sense since we are including another variable, meaning the r^2^ test becomes more harsh with more variables, especially if the variables are unhelpful in the model. We see the difference is less than a 1% change, which is to be expected as both of these regressors are significant
-
-
-
-### e. Find a 99% CI for the regression coefficient for temperature for both models in part d. Discuss any differences.
 ```{r}
+simpleSolventFit <- lm(y ~ x2, data = solventData)
+
+summary(simpleSolventFit)
 
 ```
 
 
 
-## 2. Question 4.1. Consider the simple regression model fit to the National Football League team performance data in Problem 2.1. (Data are given in Table B.1, and treats number of yards rushing by opponents ( x8 ) as the explanatory variable, and the number of games won ( y ) as the response variable.)
-### a. Construct a normal probability plot of the residuals. Does there seem to be any problem with the normality assumption?
-### b. Construct and interpret a plot of the residuals versus the predicted response.
-### c. Plot the residuals versus the team passing yardage, x2 . Does this plot indicate that the model will be improved by adding x2 to the model?
 
+For the multiple regression we see:
+r^2^ = 0.822 meaning 82.2% of variability in viscosity can be explained by the variability in the ratio and temperature.
+Adj r^2^ = 0.8124 meaning 81.24% of variability in viscosity can be explained by the variability in the ratio and temperature.
+
+For the simple regression we see:
+r^2^ = 0.5764 meaning 57.64% of variability in viscosity can be explained by the temperature.
+Adj r^2^ = 0.5653 meaning 56.53% if variability in viscosity can be explained by temperature.
+
+What we see here is that removing the ratio explanatory variable greatly decreases the power of our model. This makes sense with what we saw earlier - both variables are statistically significant when used to predict viscosity.
+
+
+### e. Find a 99% CI for the regression coefficient for temperature for both models in part d. Discuss any differences.
+```{r}
+confint(solventFit, level = .99)
+
+confint(simpleSolventFit, level = .99)
+
+```
+For the multiple regression model:
+We are 99% certain that the true regression coefficient for x1 lies between (0.87259816, 1.94206357) and the coefficient x2 lies between (-0.01950537, -0.01175233).
+<br>
+For the simple regression model:
+We are 99% certain that the true regression coefficient for x2 lies between (-0.0215221, -0.009735601)
+<br>
+<br>
+
+What we see here is that there is a wider range for the simple model. This again makes sense since we removed the other helpful explanatory variable, so our model will be less accurate overall at determining the true range of the coefficient, leading to a wider interval.
+
+
+## 2. Question 4.1. Consider the simple regression model fit to the National Football League team performance data in Problem 2.1. (Data are given in Table B.1, and treats number of yards rushing by opponents ( x8 ) as the explanatory variable, and the number of games won (y) as the response variable.)
+
+
+
+### a. Construct a normal probability plot of the residuals. Does there seem to be any problem with the normality assumption?
+```{r}
+nflData <- table.b1 
+nflFit <- lm(y ~ x8, data = nflData)
+nflResid <- resid(nflFit)
+qqnorm(nflResid)
+qqline(nflResid)
+```
+
+It seems like there is some oscillation, but its important to note that we have a small sample (28), and that the oscillations are very small. It should be safe to assume normality here.
+
+
+### b. Construct and interpret a plot of the residuals versus the predicted response.
+```{r}
+nflPred <- predict(nflFit)
+
+
+nflResid <- resid(nflFit)
+
+
+plot(nflPred, nflResid, main = "Residuals vs. Predicted Response", 
+     xlab = "Predicted Response", ylab = "Residuals")
+abline(h = 0, col = "red")
+```
+We see random scatter around the horizontal line, and no pattern, meaning regression would be a good method of approaching this data.
+
+
+### c. Plot the residuals versus the team passing yardage, x2 . Does this plot indicate that the model will be improved by adding x2 to the model?
+```{r}
+plot(nflData$x2, nflResid, main = "Residuals vs. Team Passing Yardage", 
+     xlab = "Team Passing Yardage (x2)", ylab = "Residuals")
+abline(h = 0, col = "red")  # Add a horizontal line at y = 0
+```
+It seems that there is a trend overall and that it is not randomly scattered. Higher values of x2 seem to indicate higher residuals. We might benefit from adding x2 to our model.
 
 ## 3. Question 4.17. In Problem 3.14, you were asked to fit a model to the kinematic viscosity data in Table B.10.
 ### a. Construct a normality plot of the residuals from the full model. Does there seem to be any problem with the normality assumption?
+```{r}
+solventResid <- resid(solventFit)
+
+
+qqnorm(solventResid)
+qqline(solventResid)
+
+
+```
+Here it looks like there may be an issue with the normality assumption. Below values of -1 and above values of 1, the residuals are consistently above the line. This can mean heavier tails than a normal distribution.
+
+
+
+
+
 ### b. Construct and interpret a plot of the residuals versus the predicted response.
+```{r}
+solvPred <- predict(solventFit)
+
+
+solvResid <- resid(solventFit)
+
+
+plot(solvPred, solvResid, main = "Residuals vs. Predicted Response", 
+     xlab = "Predicted Response", ylab = "Residuals")
+abline(h = 0, col = "red")
+
+
+ggplot(solventData, aes(x = x1, y = y)) +
+  geom_point() +
+  labs(x = "Explanatory Variable x1", y = "Response Variable y") +
+  ggtitle("Scatter Plot of y against x1")
+
+# Create scatter plot of y against x2
+ggplot(solventData, aes(x = x2, y = y)) +
+  geom_point() +
+  labs(x = "Explanatory Variable x2", y = "Response Variable y") +
+  ggtitle("Scatter Plot of y against x2")
+
+
+
+```
+We clearly see an issue here, instead of randomly scattered, the residuals take a parabolic shape, meaning the data might not necessarily be best fit with a linear model. Plotting both x1 and x2 against y we see this is true.
+
+
+
 ### c. In Problem 3.14, you were asked to fit a second model. Compute the PRESS statistic for both models. Based on this statistic, which model is most likely to provide better predictions of new data?
+```{r}
+PRESS(solventFit)
+
+PRESS(simpleSolventFit)
+```
+The model solventFit has a lower PRESS statistic (3.112132) compared to simpleSolventFit (6.776641). Thus, the model solventFit is more likely to provide better predictions of new data, as it has a lower prediction error.
+
