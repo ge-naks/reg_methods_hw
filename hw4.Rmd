@@ -43,14 +43,21 @@ glassFit
 ```
 We see here that there is a positive trend, as weeks increase, so do the number of defects per 10k. Our B0 is -31.698, indicating that at week 0, there are -31.698 defects. This doesnt really make sense in a case like this, defects can only be 0 per 10K, so we can conclude that it is negative because the defects are less frequent than 10K, i.e. they still occur, but maybe more likely in say, 20K bottles. Out B1 is 7.277, meaning that for each passing week, we can expect the number of defects to increase by 7.277 defects/10K bottles.
 
-Looking at the significance, we see that we have a P value of 2.35e-06, extremely low for any value of alpha. We can conclude that the model is significant. However, looking at the plot of residuals vs fitted values, we see that they are parabolic in shape, suggesting an issue with out model. We can remedy this through transforms in the next question. 
+Looking at the significance, we see that we have a P value of 2.35e-06, extremely low for any value of alpha. We can conclude that the model is significant. However, looking at the plot of residuals vs fitted values, we see that they are parabolic in shape, suggesting an issue with our model. We can remedy this through transforms in the next question. 
 
 
 ### b. Suggest an appropriate transformation to eliminate the problems encountered in part a. Fit the transformed model and check for adequacy.
 ```{r}
+log_defects <- log(defects_per_10000)
+
+logGlassFit <- lm(log_defects ~ weeks, data = glass_defects)
+
+par(mfrow=c(2,2))  # Set up the plotting layout
+plot(logGlassFit)
+
 
 ```
-
+Applying a log transform improves the shape of our residuals vs Fitted graph and gives us a more scattered shape, although it is not perfect.
 
 
 ## 2. Question 5.12. Vining and Myers (“Combining Taguchi and Response Surface Philosophies:
@@ -60,6 +67,38 @@ the effect of speed ( x1 ), pressure ( x2 ), and distance ( x3 ) on a printing m
 to apply coloring inks on package labels. The following table summarizes the experimental
 results.
 ## a. Fit an appropriate model to each response and conduct the residual analysis.
+```{r}
+data(p5.12)
+
+# Fit models for each response variable
+model_yi1 <- lm(yi1 ~ xi + x2 + x3, data = p5.12)
+model_yi2 <- lm(yi2 ~ xi + x2 + x3, data = p5.12)
+model_yi3 <- lm(yi3 ~ xi + x2 + x3, data = p5.12)
+
+# Residual analysis for model_yi1
+plot(model_yi1, which = 1)  # Residuals vs Fitted
+plot(model_yi1, which = 2)  # Normal Q-Q plot
+plot(model_yi1, which = 3)  # Scale-Location plot
+plot(model_yi1, which = 4)  # Residuals vs Leverage
+
+# Residual analysis for model_yi2
+plot(model_yi2, which = 1)  
+plot(model_yi2, which = 2)  
+plot(model_yi2, which = 3)  
+plot(model_yi2, which = 4)  
+
+# Residual analysis for model_yi3
+plot(model_yi3, which = 1)  
+plot(model_yi3, which = 2)  
+plot(model_yi3, which = 3)  
+plot(model_yi3, which = 4)  
+```
+
+We see several issues across the the 3 models, especially with influential point. For model 1, we see that 19,24,25 are all influential points.
+<br>
+Similarly, in model 2, we have points 9,25,27 are high on cooks distance.
+
+
 ## b. Use the sample variances as the basis for weighted least-squares estimation of the original data (not the sample means).
 ## c. Vining and Myers suggest fitting a linear model to an appropriate transformation of the sample variances. Use such a model to develop the appropriate weights and repeat part b
 
