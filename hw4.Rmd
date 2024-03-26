@@ -1,0 +1,65 @@
+# HW4 George W Nakhla
+
+
+Package installs:
+```{r}
+#install.packages("MPV")
+library("MPV")
+library("knitr")
+#install.packages("ggplot2")
+library("ggplot2")
+#install.packages("qpcR")
+library(qpcR)
+```
+
+
+## 1. Question 5.5. A glass bottle manufacturing company has recorded data on the average number of defects per 10,000 bottles due to stones (small pieces of rock embedded in the bottle wall) and the number of weeks since the last furnace overhaul.
+
+```{r}
+# create df from supplied data
+
+defects_per_10000 <- c(13.0, 16.1, 14.5, 17.8, 22.0, 27.4, 16.8, 34.2, 65.6, 49.2, 66.2, 81.2, 87.4, 114.5)
+weeks <- c(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17)
+glass_defects <- data.frame(defects_per_10000, weeks)
+```
+
+### a. Fit a straight-line regression model to the data and perform the standard tests for model adequacy.
+```{r}
+glassFit <- lm(defects_per_10000 ~ weeks, data = glass_defects)
+
+ggplot(glass_defects, aes(x = weeks, y = defects_per_10000)) +
+  geom_point() +  # Add points
+  geom_smooth(method = "lm", se = FALSE) +  # Add linear regression line
+  labs(x = "Weeks", y = "Defects per 10,000") +  # Add axis labels
+  ggtitle("Linear Regression of Defects per 10,000 over Weeks")
+
+
+par(mfrow=c(2,2))  # Set up the plotting layout
+plot(glassFit)
+
+anova(glassFit)
+summary(glassFit)
+glassFit
+```
+We see here that there is a positive trend, as weeks increase, so do the number of defects per 10k. Our B0 is -31.698, indicating that at week 0, there are -31.698 defects. This doesnt really make sense in a case like this, defects can only be 0 per 10K, so we can conclude that it is negative because the defects are less frequent than 10K, i.e. they still occur, but maybe more likely in say, 20K bottles. Out B1 is 7.277, meaning that for each passing week, we can expect the number of defects to increase by 7.277 defects/10K bottles.
+
+Looking at the significance, we see that we have a P value of 2.35e-06, extremely low for any value of alpha. We can conclude that the model is significant. However, looking at the plot of residuals vs fitted values, we see that they are parabolic in shape, suggesting an issue with out model. We can remedy this through transforms in the next question. 
+
+
+### b. Suggest an appropriate transformation to eliminate the problems encountered in part a. Fit the transformed model and check for adequacy.
+```{r}
+
+```
+
+
+
+## 2. Question 5.12. Vining and Myers (“Combining Taguchi and Response Surface Philosophies:
+A dual Response Approach,” Journal of Quality Technology, 22, 15-22, 1990) analyze an
+experiment, which originally appeared in Box and Draper [1987]. This experiment studied
+the effect of speed ( x1 ), pressure ( x2 ), and distance ( x3 ) on a printing machine’s ability
+to apply coloring inks on package labels. The following table summarizes the experimental
+results.
+## a. Fit an appropriate model to each response and conduct the residual analysis.
+## b. Use the sample variances as the basis for weighted least-squares estimation of the original data (not the sample means).
+## c. Vining and Myers suggest fitting a linear model to an appropriate transformation of the sample variances. Use such a model to develop the appropriate weights and repeat part b
+
