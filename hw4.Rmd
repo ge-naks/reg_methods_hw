@@ -10,6 +10,10 @@ library("knitr")
 library("ggplot2")
 #install.packages("qpcR")
 library(qpcR)
+#install.packages("dplyr")
+library(dplyr)
+library(lme4)
+library(Matrix)
 ```
 
 
@@ -57,6 +61,8 @@ plot(logGlassFit)
 
 
 ```
+
+
 Applying a log transform improves the shape of our residuals vs Fitted graph and gives us a more scattered shape, although it is not perfect.
 
 
@@ -68,37 +74,118 @@ to apply coloring inks on package labels. The following table summarizes the exp
 results.
 ## a. Fit an appropriate model to each response and conduct the residual analysis.
 ```{r}
-data(p5.12)
+printerData <- p5.12
 
 # Fit models for each response variable
-model_yi1 <- lm(yi1 ~ xi + x2 + x3, data = p5.12)
-model_yi2 <- lm(yi2 ~ xi + x2 + x3, data = p5.12)
-model_yi3 <- lm(yi3 ~ xi + x2 + x3, data = p5.12)
+model_yi1 <- lm(yi1 ~ xi + x2 + x3, data = printerData)
+model_yi2 <- lm(yi2 ~ xi + x2 + x3, data = printerData)
+model_yi3 <- lm(yi3 ~ xi + x2 + x3, data = printerData)
 
-# Residual analysis for model_yi1
-plot(model_yi1, which = 1)  # Residuals vs Fitted
-plot(model_yi1, which = 2)  # Normal Q-Q plot
-plot(model_yi1, which = 3)  # Scale-Location plot
-plot(model_yi1, which = 4)  # Residuals vs Leverage
+model_ybar <- lm(ybari ~ xi + x2 + x3, data = printerData)
 
-# Residual analysis for model_yi2
-plot(model_yi2, which = 1)  
-plot(model_yi2, which = 2)  
-plot(model_yi2, which = 3)  
-plot(model_yi2, which = 4)  
-
-# Residual analysis for model_yi3
-plot(model_yi3, which = 1)  
-plot(model_yi3, which = 2)  
-plot(model_yi3, which = 3)  
-plot(model_yi3, which = 4)  
+par(mfrow=c(2,2))  # Set up the plotting layout
+plot(model_yi1)
+plot(model_yi2)
+plot(model_yi3)
+plot(model_ybar)
 ```
 
-We see several issues across the the 3 models, especially with influential point. For model 1, we see that 19,24,25 are all influential points.
+We see several issues across the the 3 models, especially with influential point. For model all models we see that the scale location and residuals vs fitted graph is cone/funnel shaped, meaning we don't have homoskedastic errors.
 <br>
-Similarly, in model 2, we have points 9,25,27 are high on cooks distance.
+Looking specifically at cooks distance, we see that in:
+Model 1: Points 19, 24, 25 have high impact/leverage on the model
+<br>
+Model 2: Points 9, 25, 27 have high impact/leverage on the model
+<br>
+Model 3: Points 9, 25, 27 have high impact/leverage on the model
+<br>
 
 
 ## b. Use the sample variances as the basis for weighted least-squares estimation of the original data (not the sample means).
+```{r}
+# Add a small constant to avoid division by zero
+epsilon <- 1e-10  # You can adjust the value of epsilon as needed
+
+# Compute weights with a safeguard against division by zero
+weights <- 1 / (printerData$si^2 + epsilon)
+
+# Perform weighted least-squares estimation for each response variable
+modelW_yi1 <- lm(yi1 ~ xi + x2 + x3, data = printerData, weights = weights)
+modelW_yi2 <- lm(yi2 ~ xi + x2 + x3, data = printerData, weights = weights)
+modelW_yi3 <- lm(yi3 ~ xi + x2 + x3, data = printerData, weights = weights)
+
+par(mfrow=c(2,2))  # Set up the plotting layout
+plot(modelW_yi1)
+plot(modelW_yi2)
+plot(modelW_yi3)
+
+
+
+
+
+```
+We see improvement across the board, but there is still a funnel shape within the residuals vs fitted. we can add a transform in the next step to improve the model.
+
+
 ## c. Vining and Myers suggest fitting a linear model to an appropriate transformation of the sample variances. Use such a model to develop the appropriate weights and repeat part b
+```{r}
+# Define the degree of the polynomial transformation
+degree <- 2  # You can adjust this as needed
+
+# Perform polynomial transformation on the sample variances
+printerData$poly_si <- printerData$si^degree
+
+# Fit a linear model to the transformed sample variances
+variance_model <- lm(poly_si ~ xi + x2 + x3, data = printerData)
+
+# Extract the coefficients from the model
+variance_coeffs <- coef(variance_model)
+
+# Use the model to predict the transformed variances
+predicted_poly_variances <- predict(variance_model)
+
+# Transform back to obtain the predicted variances
+predicted_variances <- predicted_poly_variances^(1/degree)
+
+# Compute weights based on the predicted variances
+weights <- 1 / (predicted_variances + epsilon)
+
+# Perform weighted least-squares estimation for each response variable
+model_yi1 <- lm(yi1 ~ xi + x2 + x3, data = printerData, weights = weights)
+model_yi2 <- lm(yi2 ~ xi + x2 + x3, data = printerData, weights = weights)
+model_yi3 <- lm(yi3 ~ xi + x2 + x3, data = printerData, weights = weights)
+
+# Plot the diagnostic plots for each model
+par(mfrow=c(2,2))  # Set up the plotting layout
+plot(model_yi1)
+plot(model_yi2)
+plot(model_yi3)
+```
+Here we see a much better fit in the model and are able to see that for the lower ranges of the residual values, the model is much more linear. However, at higher ranges, the model degrades and the residuals become more positive, indicating that the model is under predicting at higher values of the explanatory variables.
+
+# 3. Question 5.21. A construction engineer studied the effect of mixing rate on the tensile strength of portland cement. From each batch she mixed, the engineer made four test samples. Of course, the mix rate was applied to the entire batch. The data follow. Perform the appropriate analysis.
+```{r}
+
+mixing_rate <- c(150, 150, 150, 150, 175, 175, 175, 175, 200, 200, 200, 200, 225, 225, 225, 225)
+tensile_strength <- c(3129, 3000, 3065, 3190, 3200, 3300, 2975, 3150, 2800, 2900, 2985, 3050, 2600, 2700, 2600, 2765)
+cement_data <- data.frame(mixing_rate, tensile_strength)
+model <- lmer(tensile_strength ~ mixing_rate + (1 | mixing_rate), data = cement_data)
+summary(model)
+
+```
+for every unit increase in mixing rate, the expected tensile strength decreases by approximately 6.047 lb/in^2. However, it's important to note that other factors beyond mixing rate may also influence tensile strength, as indicated by the variability in tensile strength between different mixing rates. Overall, the model provides a reasonable fit to the data, but further investigation into additional factors affecting tensile strength may be necessary for a comprehensive understanding.
+
+
+# 4. Question 6.12. Table B.11 contains data on the quality of Pinot Noir wine. Fit a regression model using clarity, aroma, body, flavor, and oakiness as the regressors. Investigate this model for influential observations and comment on your findings.
+
+```{r}
+wineData <- table.b11
+
+wineFit <- lm(Quality ~ Clarity + Aroma + Body + Flavor + Oakiness, data = wineData)
+
+plot(wineFit, which = 4)
+
+summary(wineFit)
+```
+Using cooks distance, we see that observation 12, 20 and 30 are of note, being farther than everything else but have not actually crossed the dashed lines to be considered influential.
 
